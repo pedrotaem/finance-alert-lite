@@ -26,8 +26,8 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 200 94% 40%; /* brand accent teal */
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
@@ -36,23 +36,30 @@ All colors MUST be HSL.
     --input: 214.3 31.8% 91.4%;
     --ring: 222.2 84% 4.9%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Brand & hero */
+    --brand: 200 94% 40%;
+    --brand-2: 262 83% 58%;
+    --hero-foreground: 0 0% 100%;
+
+    /* Shadows */
+    --shadow-soft: 0 10px 30px -15px hsl(var(--brand) / 0.25);
+    --shadow-elevated: 0 20px 40px -20px hsl(var(--brand-2) / 0.3);
+
+    /* Gradients */
+    --gradient-hero: radial-gradient(1200px 600px at 20% -10%, hsl(var(--brand) / 0.35), transparent 60%),
+      radial-gradient(1000px 500px at 80% 0%, hsl(var(--brand-2) / 0.35), transparent 55%),
+      linear-gradient(135deg, hsl(var(--brand) / 0.55), hsl(var(--brand-2) / 0.55));
   }
 
   .dark {
@@ -74,7 +81,7 @@ All colors MUST be HSL.
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 200 94% 46%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -91,6 +98,17 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --brand: 200 94% 46%;
+    --brand-2: 262 83% 58%;
+    --hero-foreground: 0 0% 100%;
+
+    --shadow-soft: 0 10px 30px -15px hsl(var(--brand) / 0.25);
+    --shadow-elevated: 0 20px 40px -20px hsl(var(--brand-2) / 0.35);
+
+    --gradient-hero: radial-gradient(1200px 600px at 20% -10%, hsl(var(--brand) / 0.35), transparent 60%),
+      radial-gradient(1000px 500px at 80% 0%, hsl(var(--brand-2) / 0.35), transparent 55%),
+      linear-gradient(135deg, hsl(var(--brand) / 0.55), hsl(var(--brand-2) / 0.55));
   }
 }
 
@@ -101,5 +119,20 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .hero-surface {
+    background: var(--gradient-hero);
+    color: hsl(var(--hero-foreground));
+  }
+  .card-elevated {
+    box-shadow: var(--shadow-soft);
+    transition: var(--transition-smooth, all 0.25s ease);
+  }
+  .card-elevated:hover {
+    box-shadow: var(--shadow-elevated);
+    transform: translateY(-2px);
   }
 }
