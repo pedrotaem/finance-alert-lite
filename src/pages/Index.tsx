@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { isNative, registerForPush, ReceivedNotification } from '@/lib/push';
-import { Wallet, CreditCard, TrendingDown, Bell } from 'lucide-react';
+import { startBankNotificationListener, isAndroidNative } from '@/lib/notification-listener';
+import { Wallet, CreditCard, TrendingDown, Bell, Smartphone } from 'lucide-react';
 
 // Tip: Persist simple state in localStorage for this MVP
 function useLocalStorage<T>(key: string, initial: T) {
@@ -51,6 +52,7 @@ function parseNotificationToTx(n: ReceivedNotification): Transaction | null {
 const Index = () => {
   const [connected, setConnected] = useLocalStorage<boolean>('push-connected', false);
   const [txs, setTxs] = useLocalStorage<Transaction[]>('transactions', []);
+  const [notifEnabled, setNotifEnabled] = useLocalStorage<boolean>('notif-listener-enabled', false);
 
   const total = useMemo(() => txs.reduce((acc, t) => acc + t.amount, 0), [txs]);
   const monthSpend = useMemo(() => txs.filter(t => t.amount < 0).reduce((a, t) => a + Math.abs(t.amount), 0), [txs]);
@@ -65,6 +67,21 @@ const Index = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [connected]);
+
+  useEffect(() => {
+    if (!notifEnabled || !isAndroidNative()) return;
+    let stop: null | (() => Promise<void>) = null;
+    startBankNotificationListener((n) => {
+      const tx = parseNotificationToTx(n as unknown as ReceivedNotification);
+      if (tx) setTxs((prev) => [tx, ...prev]);
+    }).then((s) => {
+      if (s) stop = s;
+    });
+    return () => {
+      if (stop) stop();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notifEnabled]);
 
   const connectPush = async () => {
     const res = await registerForPush((n) => {
@@ -90,8 +107,17 @@ const Index = () => {
                 <Bell className="mr-2 h-5 w-5" />
                 {connected ? 'Reiniciar Push' : isNative() ? 'Conectar Push' : 'Instale no celular'}
               </Button>
+              <Button
+                size="lg"
+                variant="secondary"
+                onClick={() => setNotifEnabled((v) => !v)}
+                disabled={!isAndroidNative()}
+              >
+                <Smartphone className="mr-2 h-5 w-5" />
+                {notifEnabled ? 'Desativar Leitor Android' : 'Ativar Leitor Android'}
+              </Button>
               <span className="text-sm opacity-80">
-                {isNative() ? 'Disponível no app nativo' : 'Push disponível apenas no app (Android/iOS)'}
+                {isAndroidNative() ? 'Leitor de notificações disponível (Android)' : 'Leitor disponível apenas no Android (app)'}
               </span>
             </div>
           </div>
